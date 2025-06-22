@@ -36,8 +36,8 @@ final class ListViewModelTests: XCTestCase {
     func testLoadProductsSuccess() async {
         // Given
         let expectedProducts = [
-            Product(id: "1", name: "Test Shirt", price: "£199", image: "test.jpg"),
-            Product(id: "2", name: "Test Shoes", price: "£299", image: "test2.jpg")
+            Product(name: "Test Shirt", price: "£199", image: "test.jpg", id: "1"),
+            Product(name: "Test Shoes", price: "£299", image: "test2.jpg", id: "2")
         ]
         let mockResponse = ProductsResponse(
             products: expectedProducts,
@@ -67,6 +67,7 @@ final class ListViewModelTests: XCTestCase {
 
         XCTAssertEqual(viewModel.products.count, 2)
         XCTAssertEqual(viewModel.products.first?.name, "Test Shirt")
+        XCTAssertEqual(viewModel.title, "Test Products")
         XCTAssertEqual(viewModel.state, .loaded)
         XCTAssertFalse(viewModel.state.isLoading)
         XCTAssertFalse(viewModel.state.hasError)
@@ -96,6 +97,7 @@ final class ListViewModelTests: XCTestCase {
         await fulfillment(of: [completionExpectation], timeout: 1.0)
 
         XCTAssertTrue(viewModel.products.isEmpty)
+        XCTAssertEqual(viewModel.title, "Empty Products")
         XCTAssertEqual(viewModel.state, .loaded)
         XCTAssertFalse(viewModel.state.hasError)
 
@@ -125,6 +127,7 @@ final class ListViewModelTests: XCTestCase {
         await fulfillment(of: [errorExpectation], timeout: 1.0)
 
         XCTAssertTrue(viewModel.products.isEmpty)
+        XCTAssertEqual(viewModel.title, "")
         XCTAssertFalse(viewModel.state.isLoading)
         XCTAssertTrue(viewModel.state.hasError)
         XCTAssertEqual(viewModel.state.errorMessage, "Server temporarily unavailable. Please try again.")
@@ -192,7 +195,7 @@ final class ListViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.state.hasError)
 
         // When - Setup success response and retry
-        let successProducts = [Product(id: "1", name: "Retry Test", price: "£99", image: "retry.jpg")]
+        let successProducts = [Product(name: "Retry Test", price: "£99", image: "retry.jpg", id: "1")]
         mockListService.mockResponse = ProductsResponse(products: successProducts, title: "Retry", productCount: 1)
         mockListService.mockError = nil
 
@@ -207,6 +210,7 @@ final class ListViewModelTests: XCTestCase {
         // Then
         XCTAssertEqual(viewModel.products.count, 1)
         XCTAssertEqual(viewModel.products.first?.name, "Retry Test")
+        XCTAssertEqual(viewModel.title, "Retry")
         XCTAssertEqual(viewModel.state, .loaded)
         XCTAssertFalse(viewModel.state.hasError)
 

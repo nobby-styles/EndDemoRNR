@@ -48,6 +48,7 @@ enum LoadingState: Equatable {
 final class ListViewModel: ObservableObject {
     @Published var products: [Product] = []
     @Published var state: LoadingState = .idle
+    @Published var title: String = ""
 
     private let listService: ListServiceProtocol
     private var cancellables = Set<AnyCancellable>()
@@ -57,17 +58,17 @@ final class ListViewModel: ObservableObject {
     }
 
     func loadProducts() -> AnyPublisher<Void, Never> {
-        guard !state.isLoading else { 
+        guard !state.isLoading else {
             return Just(()).eraseToAnyPublisher()
         }
-        
+
         state = .loading
-        
+
         return Future<Void, Never> { [weak self] promise in
             Task { [weak self] in
                 do {
                     let response = try await self?.listService.fetchProducts()
-
+                    self?.title = response?.title ?? ""
                     self?.products = response?.products ?? []
                     self?.state = .loaded
                     promise(.success(()))
@@ -80,17 +81,17 @@ final class ListViewModel: ObservableObject {
         }
         .eraseToAnyPublisher()
     }
-    
+
     func retryLoading() -> AnyPublisher<Void, Never> {
         return loadProducts()
     }
-    
+
     func clearError() {
         if state.hasError {
             state = .idle
         }
     }
-    
+
     private func getErrorMessage(for error: Error) -> String {
         if let requestError = error as? RequestError {
             switch requestError {

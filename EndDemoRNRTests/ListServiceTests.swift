@@ -29,11 +29,11 @@ final class ListServiceTests: XCTestCase {
     func testFetchProductsSuccess() async throws {
         // Given
         let expectedProducts = [
-            Product(
-                id: "1",
+            Product (
                 name: "Test Shirt",
                 price: "£199",
-                image: "https://example.com/image.jpg"
+                image: "https://example.com/image.jpg",
+                id: "1"
             )
         ]
         
@@ -51,7 +51,7 @@ final class ListServiceTests: XCTestCase {
         
         // Then
         XCTAssertEqual(response.products.count, 1)
-        XCTAssertEqual(response.products.first?.id, "1")
+        XCTAssertEqual(response.products.first?.endId, "1")
         XCTAssertEqual(response.products.first?.name, "Test Shirt")
         XCTAssertEqual(response.products.first?.price, "£199")
         XCTAssertEqual(response.title, "Test Products")
